@@ -183,7 +183,7 @@ def parse_params():
 	parser.add_argument('RHost', help="Remote host to connect", type=str)
 	parser.add_argument('RPort', help="Remote port to connect", type=int)
 	parser.add_argument('-I', '--interface', help="Interface to bind to (default: lo)", required=False, default="lo")
-	parser.add_argument('-M', '--mqtt', help="mqtt ip address", required=False,default="none")
+	parser.add_argument('-M', '--mqtt', help="mqtt ip address", required=False, type=str, default="none")
 	parser.add_argument('-o', '--output', help="Output type (Hexadecimal, Ascii, Canonical)", choices=['hex', 'ascii', 'canon'], required=False, default='canon')
 	parser.add_argument('-v', '--verbose', help="Verbose mode", action="store_true", required=False)
 	parser.add_argument('-t', '--trans', help="Transformation fifo2mt mode", action="store_true", required=False)
@@ -207,7 +207,7 @@ def log(mode, msg):
 	mymsg = ''
 	isprint_tomtqq = False
 
-	if not MQTTHost('.')>=3:
+	if not MQTTHost.count('.')>=3:
 		print("@Disable MQTT by default")
 	else:
 		if not isconnect_mqtt_first:
@@ -337,7 +337,7 @@ def main():
 	MQTTHost = args.mqtt
 	print("MQTT Host = " + MQTTHost)
 
-	if not MQTTHost('.')>=3:
+	if not MQTTHost.count('.')>=3:
 		print("@Disable MQTT by default")
 
 	Output = args.output
