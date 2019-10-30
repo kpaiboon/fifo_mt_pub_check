@@ -3,6 +3,8 @@
 
 
 
+
+
 '''
 pgrep -f youAppFile.py | xargs kill -9
 
@@ -214,7 +216,6 @@ def log(mode, msg):
             client2 = mqtt.Client(client_id='', clean_session=True, userdata=None, protocol=mqtt.MQTTv31)
             client2.on_connect = on_connect2
             client2.disconnect()
-            #client2.connect('45.63.107.108', 1883)
             client2.connect(MQTTHost, 1883)
             client2.loop_start()
             print('Connected mqtt client2')
