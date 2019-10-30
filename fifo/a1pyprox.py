@@ -206,24 +206,23 @@ def log(mode, msg):
 	
 	mymsg = ''
 	isprint_tomtqq = False
-    
-    if not MQTTHost('.')>=3:
+
+	if not MQTTHost('.')>=3:
 		print("@Disable MQTT by default")
-        
-    else:
-        if not isconnect_mqtt_first:
-            isconnect_mqtt_first = True
-            client2 = mqtt.Client(client_id='', clean_session=True, userdata=None, protocol=mqtt.MQTTv31)
-            client2.on_connect = on_connect2
-            client2.disconnect()
-            client2.connect(MQTTHost, 1883)
-            client2.loop_start()
-            print('Connected mqtt client2')
-            try:
-                client2.publish(MQTT_TOPIC_UP,"MQTT Log -->Hi all,",qos=0, retain=False)
-            except:
-                print("MQTT Client2 PUB: Something went wrong")
-	
+	else:
+		if not isconnect_mqtt_first:
+			isconnect_mqtt_first = True
+			client2 = mqtt.Client(client_id='', clean_session=True, userdata=None, protocol=mqtt.MQTTv31)
+			client2.on_connect = on_connect2
+			client2.disconnect()
+			client2.connect(MQTTHost, 1883)
+			client2.loop_start()
+			print('Connected mqtt client2')
+			try:
+				client2.publish(MQTT_TOPIC_UP,"MQTT Log -->Hi all,",qos=0, retain=False)
+			except:
+				print("MQTT Client2 PUB: Something went wrong")
+
 	output=sys.stdout
 	if Verbose:
 		if mode == 'i': # Info
@@ -251,16 +250,15 @@ def log(mode, msg):
 	output.write(str(msg) + "\n")
 	output.flush()
 	
-    if isconnect_mqtt_first:
-        if isprint_tomtqq:
-            isprint_tomtqq = False
-            mymsg = mymsg + str(msg) # or no str() made died msg
-            try:
-                client2.publish(MQTT_TOPIC_UP,mymsg,qos=0, retain=False)
-            except:
-                print("MQTT Client2 PUB: Something went wrong")
-                
-	
+	if isconnect_mqtt_first:
+		if isprint_tomtqq:
+			isprint_tomtqq = False
+			mymsg = mymsg + str(msg) # or no str() made died msg
+			try:
+				client2.publish(MQTT_TOPIC_UP,mymsg,qos=0, retain=False)
+			except:
+				print("MQTT Client2 PUB: Something went wrong")
+
 
 def hexdump(src, origin, length=16):
 	global Output
@@ -302,48 +300,46 @@ def hexdump(src, origin, length=16):
 	log("h", "\r\nASCII: " + origin + str(len(src)) + "\r\n" + str(src) )
 	
 
-
 def if2ip(ifname):
 	if ifname.count('.')>=3:
-            print('@overide Interface IPv4 by xxx.x.x.x')
-            ip = ifname
-        
-	else:            
-            import fcntl
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            ip=socket.inet_ntoa(fcntl.ioctl(
+		print('@overide Interface IPv4 by xxx.x.x.x')
+		ip = ifname
+	else:
+		import fcntl
+		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		ip=socket.inet_ntoa(fcntl.ioctl(
 		s.fileno(),
 		0x8915,
 		struct.pack('256s', bytes(ifname[:15], 'utf-8'))
-            )[20:24])
-            s.close()
-        
+			)[20:24])
+			s.close()
+
 	return ip
 
 
 def main():
 	global Verbose, Output, Trans, MQTTHost
-	
+
 	for (i, val) in enumerate(show_mesg):
 		print(val)
-	
-	
+
+
 	loop = asyncio.get_event_loop()
-	
+
 	args = parse_params()
 	if args.verbose:
 		Verbose = True
-	
+
 	if args.trans:
 		print("Trans = True")
 		Trans = True
 
 	MQTTHost = args.mqtt
-    print("MQTT Host = " + MQTTHost)
-    
-    if not MQTTHost('.')>=3:
+	print("MQTT Host = " + MQTTHost)
+
+	if not MQTTHost('.')>=3:
 		print("@Disable MQTT by default")
-    
+
 	Output = args.output
 	try:
 		args.LHost=if2ip(args.interface)
@@ -353,7 +349,7 @@ def main():
 		log('e', "Invalid interface '{}'".format(args.interface))
 		log('e', e)
 		return
-	
+
 	log("i", "Starting...")
 
 	coro = loop.create_server(lambda: PyProxLocal((args.RHost, args.RPort)), args.LHost, args.LPort)
