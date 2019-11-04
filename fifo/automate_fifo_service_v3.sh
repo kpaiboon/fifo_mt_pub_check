@@ -21,14 +21,14 @@ echo "Fifo starting in 5s"
 
 
 #sleep
-echo "Wait for 5 seconds"
+echo "Wait for 5 seconds to Kill processes"
 sleep 5
 echo "Completed"
 
 
 #ps aux  |  grep -i csp_build  |  awk '{print $2}'  |  xargs sudo kill -9
 ps aux  |  grep -i a1pyprox.py  |  awk '{print $2}'  |  xargs kill -9
-
+ps aux  |  grep -i a1pyprox.py  |  awk '{print $2}'  |  xargs kill -9
 
 echo "Wait for 10 seconds to start /xxxxxx.sh"
 sleep 10
