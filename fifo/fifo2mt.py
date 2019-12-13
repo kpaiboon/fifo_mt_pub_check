@@ -23,6 +23,8 @@ SOFTWARE.
 '''
 
 #Fifo
+# Version 7
+# 2019-12-13 1. fix (*) checksum, reverse #1
 # Version 6
 # 2019-10-30 1. MIT License
 # Version 5
@@ -38,7 +40,7 @@ SOFTWARE.
 # Version 2
 # 2019-16-06 fiexed Analog data requires 5 addresses
 
-__code_version = 'fifo2mt.v6'
+__code_version = 'fifo2mt.v7'
 
 __autoSpeedforceIO = 5 #5km/h
 
@@ -58,6 +60,7 @@ Samplecmd = [
     '@@k28,864507030181266,B25,60*1B',
     '@@z25,864507030181266,E91*9B\r\n',
     '@@\60,864507030181266,C50,22,23,24,0,0,0,0,0,0,0,0,0,0,0,0,0*D4',
+    '@@a31,868998030242818,C07,*102#*99', #This Fifo USSD for Dtac '*102#'
     '@@G25,864507030181266,B70*62']
 
 
@@ -73,13 +76,30 @@ import re
       GPGSV,3,3,10,26,37,134,00,29,25,136,00*76"
 """
 
-def checksum(sentence):
-
+def checksum(sentence,_verbose=False):
+    _verbose=True
     """ Remove any newlines """
     if re.search("\n$", sentence):
         sentence = sentence[:-1]
 
-    nmeadata,cksum = re.split(r'\*', sentence)
+    #nmeadata,cksum = re.split(r'\*', sentence)
+    
+    #if _verbose:
+    #    print(">>fun checksum:org nmeadata::[",nmeadata,"]")
+    #    print(">>fun checksum:org cksum::[",cksum,"]")
+
+    if len(sentence) > 3:
+        _s_loc = sentence.rfind('*')
+        #_s_loc = 31
+        nmeadata = sentence[:_s_loc]
+        cksum = sentence[_s_loc:len(sentence)]
+
+    if _verbose:
+        print(">>fun checksum:new _s_loc::[",_s_loc,"]")
+        print(">>fun checksum:new nmeadata::[",nmeadata,"]")
+        print(">>fun checksum:new cksum::[",cksum,"]")
+
+
 
     calc_cksum = 0
     for s in nmeadata:
@@ -335,6 +355,7 @@ def main():
        should be 10 not 20)
     """
     line = "GPGSV,3,3,20,26,37,134,00,29,25,136,00*76\n"
+    line = "GPGSV,3,3,20,26,37,134,0*0,29,25,136,00*76\n"
 
     """ Get NMEA data and checksums """
 
@@ -342,8 +363,11 @@ def main():
 
     """ Verify checksum (will report checksum error) """ 
     if cksum != calc_cksum:
-        print("Error in checksum for: %s" % (data))
+        #print("Error in checksum for: %s" % (data))
+        print("Error in checksum for: %s" % (line))
         print("Checksums are %s and %s" % (cksum,calc_cksum))
+    else:
+        print("Fun checksum fault!!")
         
     line = "GPGSV,3,3,10,26,37,134,00,29,25,136,00*76\n"
     
@@ -353,9 +377,11 @@ def main():
 
     """ Verify checksum (will report checksum True) """ 
     if cksum == calc_cksum:
-        print("True in checksum for: %s" % (data))
+        #print("True in checksum for: %s" % (data))
+        print("True in checksum for: %s" % (line))
         print("Checksums are %s and %s" % (cksum,calc_cksum))
-        
+    else:
+        print("Fun checksum fault!!")        
     
     fifo2mt("SSS")
     fifo2mt("CCC",_verbose=True)
@@ -375,6 +401,34 @@ if __name__=='__main__':
     main()
 
 
+
+'''
+
+fifo2mt.v6/7.error (DTAC *102#)
+@@a31,868998030242818,C07,*102#*99
+868998030242818,C07,
+5
+26
+868998030242818,1,C07,
+15
+>>fun checksum: nmeadata::[ ##23,868998030242818,1,C07, ]
+>>fun checksum: cksum::[ FF ]
+4C
+##23,868998030242818,1,C07,*4C
+
+fifo2mt.v6/7 OK
+@@G25,864507030181266,B70*62
+864507030181266,B70
+5
+25
+864507030181266,1,B70
+15
+>>fun checksum: nmeadata::[ ##22,864507030181266,1,B70 ]
+>>fun checksum: cksum::[ FF ]
+69
+##22,864507030181266,1,B70*69
+
+'''
 
 
 '''
