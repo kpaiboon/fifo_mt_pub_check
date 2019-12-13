@@ -77,7 +77,7 @@ import re
 """
 
 def checksum(sentence,_verbose=False):
-    _verbose=True
+    #_verbose=True
     """ Remove any newlines """
     if re.search("\n$", sentence):
         sentence = sentence[:-1]
@@ -88,18 +88,14 @@ def checksum(sentence,_verbose=False):
     #    print(">>fun checksum:org nmeadata::[",nmeadata,"]")
     #    print(">>fun checksum:org cksum::[",cksum,"]")
 
-    if len(sentence) > 3:
-        _s_loc = sentence.rfind('*')
-        #_s_loc = 31
-        nmeadata = sentence[:_s_loc]
-        cksum = sentence[_s_loc:len(sentence)]
+    _s_loc = sentence.rfind('*')
+    nmeadata = sentence[:_s_loc]
+    cksum = sentence[_s_loc+1:len(sentence)]
 
     if _verbose:
         print(">>fun checksum:new _s_loc::[",_s_loc,"]")
         print(">>fun checksum:new nmeadata::[",nmeadata,"]")
         print(">>fun checksum:new cksum::[",cksum,"]")
-
-
 
     calc_cksum = 0
     for s in nmeadata:
@@ -307,7 +303,8 @@ def mt2fi(datin,_verbose=False):
 
     #cut IMEI + Payload
     x = txt.find(",")
-    y = txt.find("*")
+    #y = txt.find("*")
+    y = txt.rfind("*")
     txt = txt[x+1:y]
 
     if _verbose:
@@ -357,8 +354,8 @@ def main():
     line = "GPGSV,3,3,20,26,37,134,00,29,25,136,00*76\n"
     line = "GPGSV,3,3,20,26,37,134,0*0,29,25,136,00*76\n"
 
-    """ Get NMEA data and checksums """
-
+    """ Get NMEA data and checksums """    
+    print("Input: %s" % (line))
     data,cksum,calc_cksum = checksum(line)
 
     """ Verify checksum (will report checksum error) """ 
@@ -372,7 +369,7 @@ def main():
     line = "GPGSV,3,3,10,26,37,134,00,29,25,136,00*76\n"
     
     """ Get NMEA data and checksums """
-
+    print("Input: %s" % (line))
     data,cksum,calc_cksum = checksum(line)
 
     """ Verify checksum (will report checksum True) """ 
