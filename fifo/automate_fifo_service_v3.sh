@@ -1,4 +1,6 @@
 #!/bin/bash
+# use shell $: nohup ./automate_fifo_service_v3.sh &
+
 echo "Hello World"
 echo "Fifo starting in 5s"
 
